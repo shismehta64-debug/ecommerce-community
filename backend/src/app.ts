@@ -27,10 +27,23 @@ const app = express();
 
 // ─── Global Middleware ───────────────────────────────────
 
-// CORS — allow frontend origin
+// CORS — allow frontend origin(s), supports comma-separated list
+const rawOrigins = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = rawOrigins
+  .split(',')
+  .map((o) => o.trim().replace(/\/$/, '')); // strip trailing slashes
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+      }
+    },
     credentials: true,
   })
 );
