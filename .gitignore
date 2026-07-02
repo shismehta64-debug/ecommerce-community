@@ -1,0 +1,25 @@
+# Dependency Directories
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Local Environment Variables
+.env
+backend/.env
+frontend/.env
+*.env
+
+# TypeScript build files
+dist/
+backend/dist/
+frontend/dist/
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE configuration files
+.vscode/
+.idea/
+.gemini/

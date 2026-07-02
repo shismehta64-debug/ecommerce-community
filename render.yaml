@@ -1,0 +1,39 @@
+services:
+  # ─── Backend Web Service ─────────────────────────────────
+  - type: web
+    name: community-connect-backend
+    env: node
+    plan: free # Can be upgraded by user in the dashboard
+    rootDir: backend
+    buildCommand: npm install && npm run build && npx prisma generate
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false # User will paste their Supabase Transaction Connection String in Render UI
+      - key: DIRECT_URL
+        sync: false # User will paste their Supabase Direct Connection String in Render UI
+      - key: JWT_SECRET
+        generateValue: true # Render will automatically generate a secure random string
+      - key: GOOGLE_CLIENT_ID
+        sync: false # User will paste their Google Client ID in Render UI
+      - key: FRONTEND_ORIGIN
+        sync: false # User will paste the deployed frontend URL here after it is created
+
+  # ─── Frontend Static Site ────────────────────────────────
+  - type: static
+    name: community-connect-frontend
+    publishDir: dist
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    envVars:
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false # User will paste their Google Client ID here
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: community-connect-backend
+          property: host # Automatically links to the backend URL

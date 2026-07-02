@@ -1,0 +1,348 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum IndustrySegment {
+  TEXTILE
+  CHEMICAL
+  MECHANICAL_ENGINEERING
+  DIAMOND_JEWELLERY
+  PLASTICS
+  CERAMICS
+  PHARMA
+  FOOD_PROCESSING
+  IT_SERVICES
+  REAL_ESTATE
+  LOGISTICS
+  AUTOMOBILE_PARTS
+  HANDICRAFTS
+  OTHERS
+}
+
+enum ProduceCategory {
+  VEGETABLE
+  FRUIT
+  GRAIN
+  DAIRY
+  OTHER
+}
+
+enum ProduceUnit {
+  KG
+  DOZEN
+  QUINTAL
+}
+
+enum WomenProductCategory {
+  HANDICRAFTS
+  FOOD_PICKLES
+  CLOTHING_BOUTIQUE
+  JEWELLERY_ACCESSORIES
+  BEAUTY_WELLNESS
+  HOME_DECOR
+  OTHERS
+}
+
+enum ProviderType {
+  INDIVIDUAL
+  NGO
+}
+
+enum SocialServiceCategory {
+  EDUCATION_TUITION
+  HEALTHCARE_CAMP
+  SKILL_TRAINING
+  COUNSELING
+  LEGAL_AID
+  OTHERS
+}
+
+enum EnquiryListingType {
+  INDUSTRY_PRODUCT
+  SOCIAL_SERVICE
+}
+
+enum EnquiryStatus {
+  PENDING
+  CONTACTED
+  CLOSED
+}
+
+enum CartItemType {
+  FARMER_PRODUCE
+  WOMEN_PRODUCT
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum Relation {
+  SELF
+  SPOUSE
+  SON
+  DAUGHTER
+  FATHER
+  MOTHER
+  OTHER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  ENGAGED
+  DIVORCED
+  WIDOWED
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id              String   @id @default(uuid())
+  fullName        String
+  email           String   @unique
+  phone           String?  @unique
+  passwordHash    String?
+  googleId        String?  @unique
+  city            String
+  state           String
+  role            Role     @default(MEMBER)
+  profilePhotoUrl String?
+  isVerified      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  businesses     Business[]
+  farmerProduces FarmerProduce[]
+  womenProducts  WomenProduct[]
+  socialServices SocialService[]
+  enquiriesSent  Enquiry[]       @relation("BuyerEnquiries")
+  enquiriesRecv  Enquiry[]       @relation("SellerEnquiries")
+  cartItems      CartItem[]
+  orders         Order[]
+  families       Family[]
+
+  @@index([city])
+  @@index([email])
+  @@index([phone])
+}
+
+model Business {
+  id             String          @id @default(uuid())
+  ownerId        String
+  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  businessName   String
+  segment        IndustrySegment
+  description    String
+  city           String
+  state          String
+  address        String
+  contactPhone   String
+  whatsappNumber String?
+  contactEmail   String?
+  logoUrl        String?
+  gstNumber      String?
+  isVerified     Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+
+  products IndustryProduct[]
+
+  @@index([segment])
+  @@index([city])
+  @@index([businessName])
+}
+
+model IndustryProduct {
+  id          String   @id @default(uuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name        String
+  description String
+  category    String
+  priceRange  String
+  unit        String
+  images      String[]
+  moq         String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+  @@index([name])
+}
+
+model FarmerProduce {
+  id                String          @id @default(uuid())
+  ownerId           String
+  owner             User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  cropName          String
+  category          ProduceCategory
+  pricePerUnit      Float
+  unit              ProduceUnit
+  quantityAvailable Float
+  harvestDate       DateTime?
+  village           String?
+  city              String
+  images            String[]
+  isOrganic         Boolean         @default(false)
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+
+  @@index([category])
+  @@index([city])
+  @@index([cropName])
+}
+
+model WomenProduct {
+  id            String               @id @default(uuid())
+  ownerId       String
+  owner         User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name          String
+  description   String
+  category      WomenProductCategory
+  price         Float
+  stockQuantity Int
+  images        String[]
+  isActive      Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+
+  @@index([category])
+  @@index([name])
+}
+
+model SocialService {
+  id           String                @id @default(uuid())
+  ownerId      String
+  owner        User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  providerType ProviderType
+  serviceName  String
+  category     SocialServiceCategory
+  description  String
+  schedule     String?
+  city         String
+  address      String?
+  contactPhone String
+  isActive     Boolean               @default(true)
+  createdAt    DateTime              @default(now())
+
+  @@index([category])
+  @@index([city])
+  @@index([serviceName])
+}
+
+model Enquiry {
+  id           String             @id @default(uuid())
+  listingType  EnquiryListingType
+  listingId    String
+  buyerId      String
+  buyer        User               @relation("BuyerEnquiries", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId     String
+  seller       User               @relation("SellerEnquiries", fields: [sellerId], references: [id], onDelete: Cascade)
+  message      String
+  contactPhone String
+  status       EnquiryStatus      @default(PENDING)
+  createdAt    DateTime           @default(now())
+
+  @@index([buyerId])
+  @@index([sellerId])
+}
+
+model CartItem {
+  id       String       @id @default(uuid())
+  userId   String
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType CartItemType
+  itemId   String
+  quantity Int
+
+  @@unique([userId, itemType, itemId])
+  @@index([userId])
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalAmount     Float
+  status          OrderStatus @default(PENDING)
+  shippingAddress String
+  createdAt       DateTime    @default(now())
+
+  items OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id               String       @id @default(uuid())
+  orderId          String
+  order            Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemType         CartItemType
+  itemId           String
+  itemNameSnapshot String
+  quantity         Int
+  priceAtPurchase  Float
+
+  @@index([orderId])
+}
+
+model Family {
+  id                  String   @id @default(uuid())
+  headOfFamilyUserId  String
+  headOfFamily        User     @relation(fields: [headOfFamilyUserId], references: [id], onDelete: Cascade)
+  familyName          String
+  nativePlace         String?
+  currentCity         String
+  currentState        String
+  currentAddress      String?
+  contactPhone        String?
+  contactEmail        String?
+  isPublic            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+
+  members FamilyMember[]
+
+  @@index([currentCity])
+  @@index([familyName])
+}
+
+model FamilyMember {
+  id            String        @id @default(uuid())
+  familyId      String
+  family        Family        @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  fullName      String
+  relation      Relation
+  gender        Gender
+  dob           DateTime?
+  education     String?
+  profession    String?
+  companyName   String?
+  maritalStatus MaritalStatus @default(SINGLE)
+  photoUrl      String?
+  bio           String?
+  createdAt     DateTime      @default(now())
+
+  @@index([familyId])
+}

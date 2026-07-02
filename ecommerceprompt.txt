@@ -1,0 +1,33 @@
+So our project is making of a community based platform that is a mix of ecommerce and also mix of social platform so there are total 2 modules inside of it first ecommerce and second is social contacts and in ecommerce there are 4 more sub modules 
+
+1.industrty:
+
+where the people of that particular community can list their industry and products so that the community can grow much stronger so now for customer he can choose segment of industry like there are so many segments like chemical,mechanical,textile and many more decide it by youself according to india and specifically for gujarat and surat 
+
+
+
+2.farmer
+
+because of the retailers the farmer are not able to generate much money out of it for an example i also come from a farmer background they take vegetable from us at 80rs for 20kg and then they sell 40rs for kg in market so thats where farmer lose their most of the money so we are developing this module where farmers can list out their products like ecommerce for vegetables for community 
+
+
+
+3.women entrepreneur :
+
+where specifically women entrepreneur can sell their items here and people from same or diffrent community can buy  this products 
+
+
+
+4.social work:
+
+this is for non profit organizations or individual social workers who want to provide services for free like there are teachers who provide tution for free and all that so the people of community can grow 
+
+
+
+now the second module social contacts 
+
+here families can show their biodata online and bio data of each family member like everything education proffesion name age and basically everything like the amount of details required in any matrimonial site like that much details about any family and yk the use of this  is for example my family is moving to another city and if i want to contact someone from my comunity in that particular city then i can contact them and also we can filter based on city and we can get details of whole family in very detailed like everything so it becomes easy to communicate and this is purely used for social contact and can be used for matrimonial also 
+
+
+
+give me extremly detailed prompt for making this project using gemini3.5 flash for frontend and claude opus4.6 fpr backend and i want you to first make frontend prompt for gemini and then give backend prompt for pus4.6 in a way that it can correctly alligned with frotend and it does not face any problem connecting frontend and backend together and connecting endpoints and also the frontend should be classic interactive and clean nothing complex so create thsi for me please
